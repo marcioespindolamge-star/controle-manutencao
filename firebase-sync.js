@@ -3,6 +3,7 @@ import {getAuth,signInAnonymously,onAuthStateChanged} from 'https://www.gstatic.
 import {getFirestore,collection,getDocs,doc,setDoc,deleteDoc} from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
 const config={apiKey:'AIzaSyB7rFMM7Lt1LNVQMivytUnpkOjnAxy-Uj4',authDomain:'controle-manutencao-paineira.firebaseapp.com',projectId:'controle-manutencao-paineira',storageBucket:'controle-manutencao-paineira.firebasestorage.app',messagingSenderId:'54219707216',appId:'1:54219707216:web:eb3b0567ec520fdaa39255'};
 const message=document.getElementById('firebaseMessage');
+message.textContent='Conectando ao Firebase...';
 const uidInput=document.getElementById('firebaseUid');
 const authorizedDevices=['HkUgFR85JaeDssHMvgEQe9Oj4VQ2','c6iH6JSfchf6gTzcArmIrzpqKWP2'];
 const app=getApps().length?getApp():initializeApp(config);
@@ -33,5 +34,5 @@ onAuthStateChanged(auth,async user=>{
  window.applyCloudRecords(merged);
  ready=true;status('Firebase conectado ✓ '+merged.length+' manutenção(ões) sincronizada(s).');
  void flush();
- }catch(e){status('Não foi possível sincronizar: '+e.code+'. Registros locais preservados.')}
+ }catch(e){status('Não foi possível sincronizar: '+(e.code||e.message||'erro desconhecido')+'. Registros locais preservados.')}
 });
