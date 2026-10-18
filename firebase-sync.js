@@ -9,6 +9,7 @@ const app=getApps().length?getApp():initializeApp(config);
 const auth=getAuth(app),db=getFirestore(app),col=collection(db,'manutencoes');
 let ready=false;
 const pending=[];
+let syncStarted=false;
 function status(s){message.textContent=s}
 function local(){try{return JSON.parse(localStorage.getItem('paineira-manutencao')||'[]')}catch{return []}}
 function enqueue(op){pending.push(op);if(ready)void flush()}
@@ -19,13 +20,15 @@ window.firebaseDelete=id=>enqueue({type:'delete',id});
 onAuthStateChanged(auth,async user=>{
  if(!user){try{await signInAnonymously(auth)}catch(e){status('Erro na identificação: '+e.code)}return}
  uidInput.value=user.uid;
- if(user.uid!==expected){status('Este navegador não está autorizado no Firestore. Os dados locais foram preservados.');return}
+ if(user.uid!==expected){status('Sincronização bloqueada: novo identificador do iPhone. Não apague registros. UID: '+user.uid);message.style.display='block';message.style.color='#a11616';message.style.padding='10px';return}
  try{
  status('Conferindo registros existentes...');
  const snap=await getDocs(col);
  const remote=new Map(snap.docs.map(d=>[String(d.id),d.data()]));
  const existing=local();
  for(const record of existing){if(!remote.has(String(record.id))){await setDoc(doc(col,String(record.id)),record);remote.set(String(record.id),record)}}
+ const newer=local();
+ for(const record of newer){if(!remote.has(String(record.id))){await setDoc(doc(col,String(record.id)),record);remote.set(String(record.id),record)}}
  const merged=[...remote.values()].sort((a,b)=>(a.id||0)-(b.id||0));
  window.applyCloudRecords(merged);
  ready=true;status('Firebase conectado ✓ '+merged.length+' manutenção(ões) sincronizada(s).');
