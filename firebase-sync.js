@@ -4,7 +4,7 @@ import {getFirestore,collection,getDocs,doc,setDoc,deleteDoc} from 'https://www.
 const config={apiKey:'AIzaSyB7rFMM7Lt1LNVQMivytUnpkOjnAxy-Uj4',authDomain:'controle-manutencao-paineira.firebaseapp.com',projectId:'controle-manutencao-paineira',storageBucket:'controle-manutencao-paineira.firebasestorage.app',messagingSenderId:'54219707216',appId:'1:54219707216:web:eb3b0567ec520fdaa39255'};
 const message=document.getElementById('firebaseMessage');
 const uidInput=document.getElementById('firebaseUid');
-const expected='HkUgFR85JaeDssHMvgEQe9Oj4VQ2';
+const authorizedDevices=['HkUgFR85JaeDssHMvgEQe9Oj4VQ2','c6iH6JSfchf6gTzcArmIrzpqKWP2'];
 const app=getApps().length?getApp():initializeApp(config);
 const auth=getAuth(app),db=getFirestore(app),col=collection(db,'manutencoes');
 let ready=false;
@@ -20,7 +20,7 @@ window.firebaseDelete=id=>enqueue({type:'delete',id});
 onAuthStateChanged(auth,async user=>{
  if(!user){try{await signInAnonymously(auth)}catch(e){status('Erro na identificação: '+e.code)}return}
  uidInput.value=user.uid;
- if(user.uid!==expected){status('Sincronização bloqueada: novo identificador do iPhone. Não apague registros. UID: '+user.uid);message.style.display='block';message.style.color='#a11616';message.style.padding='10px';return}
+ if(!authorizedDevices.includes(user.uid)){status('Dispositivo ainda não autorizado. Identificador: '+user.uid);message.style.display='block';message.style.color='#a11616';message.style.padding='10px';return}
  try{
  status('Conferindo registros existentes...');
  const snap=await getDocs(col);
