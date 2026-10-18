@@ -20,7 +20,7 @@ function showOverdue(){
   if(!annualOverdue&&!hoursOverdue)continue;
   const cycle=records.length+1;
   const tier=cycle%4===0?'1.200 h — COMPLETA':cycle%2===0?'600 h':'300 h — BÁSICA';
-  const services=cycle%4===0?'Básica + filtro hidráulico + óleos da transmissão, cubos e diferencial + filtro de ar':cycle%2===0?'Básica + filtro hidráulico':'Óleo do motor, filtro de óleo e filtro diesel';
+  const services=cycle%4===0?'Básica + filtro hidráulico + óleo de transmissão / hidráulico, óleos dos cubos e diferencial + filtros de ar interno, externo e carvão ativado':cycle%2===0?'Básica + filtro hidráulico':'Óleo do motor, filtro de óleo e filtro diesel';
   const details=[];
   if(annualOverdue)details.push('Prazo anual vencido');
   if(hoursOverdue)details.push('Ultrapassou 300 h desde a última revisão');
