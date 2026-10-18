@@ -1,1 +1,38 @@
-(function(){function showOverdue(){const report=document.getElementById('reportPane');const target=document.getElementById('overdueSummary');if(!report||!target||typeof data==='undefined')return;const today=new Date();today.setHours(0,0,0,0);const filter=document.getElementById('filter').value;let html='';for(const machine of ms){if(filter&&filter!==machine)continue;const history=data.filter(x=>x.m===machine&&x.d).sort((a,b)=>a.d.localeCompare(b.d));const last=history[history.length-1];if(!last)continue;const due=new Date(last.d+'T12:00:00');due.setFullYear(due.getFullYear()+1);due.setHours(0,0,0,0);if(due<today){const days=Math.floor((today-due)/86400000);html+='<div style="background:#ffe5e5;border-left:5px solid #c22;color:#a11616;padding:12px;margin:12px 0;border-radius:7px"><b>REVISÃO ANUAL VENCIDA — '+machine+'</b><div style="font-size:13px;margin-top:5px">Atraso: '+days+' dia(s)</div></div>'}}for(const machine of ms){if(filter&&filter!==machine)continue;const history=data.filter(x=>x.m===machine&&x.w&&x.h!==''&&Number.isFinite(Number(x.h))).sort((a,b)=>a.d.localeCompare(b.d));if(!history.length)continue;const last=history[history.length-1];const input=document.getElementById('h');const selected=document.getElementById('m');const working=document.getElementById('w');const entered=selected.value===machine&&working.checked&&input.value!==''?Number(input.value):null;const current=entered!==null&&Number.isFinite(entered)?entered:null;if(current===null)continue;const hours=current-Number(last.h);if(hours>=300){const all=data.filter(x=>x.m===machine&&x.d).sort((a,b)=>a.d.localeCompare(b.d));const cycle=all.length+1;const tier=cycle%4===0?'1.200 h (COMPLETA)':cycle%2===0?'600 h':'300 h (BÁSICA)';const services=cycle%4===0?'Básica + filtro hidráulico + óleo da transmissão, cubos das rodas e diferencial + filtro de ar do motor':cycle%2===0?'Básica + filtro hidráulico':'Óleo do motor + filtro de óleo do motor + filtro diesel';html+='<div style="background:#ffe5e5;border-left:5px solid #c22;color:#a11616;padding:12px;margin:12px 0;border-radius:7px"><b>REVISÃO VENCIDA — '+machine+' — CICLO '+tier+'</b><div style="font-size:13px;margin-top:5px">'+services+'<br>Última revisão: '+Number(last.h).toLocaleString('pt-BR')+' h · Leitura atual: '+current.toLocaleString('pt-BR')+' h · Atraso: '+Math.round(hours-300).toLocaleString('pt-BR')+' h</div></div>'}}target.innerHTML=html}const oldRender=window.render;window.render=function(){oldRender();showOverdue()};document.getElementById('filter').onchange=window.render;const oldShow=window.showTab;window.showTab=function(tab){oldShow(tab);if(tab==='report')showOverdue()};const oldCloud=window.applyCloudRecords;window.applyCloudRecords=function(rows){oldCloud(rows);showOverdue()};showOverdue()})();
+(function(){
+const oldRender=window.render;
+function showOverdue(){
+ const target=document.getElementById('overdueSummary');
+ if(!target||typeof data==='undefined')return;
+ const today=new Date();today.setHours(0,0,0,0);
+ const filter=document.getElementById('filter').value;
+ const alerts=[];
+ for(const machine of ms){
+  if(filter&&filter!==machine)continue;
+  const records=data.filter(x=>x.m===machine&&x.d).slice().sort((a,b)=>a.d.localeCompare(b.d));
+  const last=records[records.length-1];if(!last)continue;
+  const annual=new Date(last.d+'T12:00:00');annual.setFullYear(annual.getFullYear()+1);annual.setHours(0,0,0,0);
+  const annualOverdue=annual<today;
+  const hourly=records.filter(x=>x.w&&x.h!==''&&Number.isFinite(Number(x.h)));
+  const previous=hourly[hourly.length-1];
+  const entered=document.getElementById('m').value===machine&&document.getElementById('w').checked?document.getElementById('h').value:'';
+  const current=entered!==''?Number(entered):null;
+  const hoursOverdue=previous&&current!==null&&Number.isFinite(current)&&current-Number(previous.h)>=300;
+  if(!annualOverdue&&!hoursOverdue)continue;
+  const cycle=records.length+1;
+  const tier=cycle%4===0?'1.200 h — COMPLETA':cycle%2===0?'600 h':'300 h — BÁSICA';
+  const services=cycle%4===0?'Básica + filtro hidráulico + óleos da transmissão, cubos e diferencial + filtro de ar':cycle%2===0?'Básica + filtro hidráulico':'Óleo do motor, filtro de óleo e filtro diesel';
+  const details=[];
+  if(annualOverdue)details.push('Prazo anual vencido');
+  if(hoursOverdue)details.push('Ultrapassou 300 h desde a última revisão');
+  alerts.push('<div style="background:#ffe5e5;border-left:5px solid #c22;color:#a11616;padding:12px;margin:12px 0;border-radius:7px"><strong>REVISÃO VENCIDA — '+machine+'</strong><div style="font-size:13px;margin-top:5px">'+details.join(' · ')+'<br>Próximo ciclo previsto: '+tier+'<br>'+services+'</div></div>');
+ }
+ target.innerHTML=alerts.join('');
+}
+window.render=function(){oldRender();showOverdue()};
+document.getElementById('filter').onchange=window.render;
+const oldShow=window.showTab;
+window.showTab=function(t){oldShow(t);if(t==='report')showOverdue()};
+const oldCloud=window.applyCloudRecords;
+window.applyCloudRecords=function(rows){oldCloud(rows);showOverdue()};
+showOverdue();
+})();
