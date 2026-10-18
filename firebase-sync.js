@@ -20,7 +20,7 @@ window.firebaseDelete=id=>enqueue({type:'delete',id});
 onAuthStateChanged(auth,async user=>{
  if(!user){try{await signInAnonymously(auth)}catch(e){status('Erro na identificação: '+e.code)}return}
  uidInput.value=user.uid;
- if(!authorizedDevices.includes(user.uid)){status('Dispositivo ainda não autorizado. Identificador: '+user.uid);message.style.display='block';message.style.color='#a11616';message.style.padding='10px';return}
+ // A autorização real é verificada pelas regras de segurança do Firestore.
  try{
  status('Conferindo registros existentes...');
  const snap=await getDocs(col);
