@@ -6,6 +6,7 @@ function showOverdue(){
  const today=new Date();today.setHours(0,0,0,0);
  const filter=document.getElementById('filter').value;
  const alerts=[];
+ const highlighted=new Set();
  for(const machine of ms){
   if(filter&&filter!==machine)continue;
   const records=data.filter(x=>x.m===machine&&x.d).slice().sort((a,b)=>a.d.localeCompare(b.d));
@@ -24,9 +25,11 @@ function showOverdue(){
   const details=[];
   if(annualOverdue)details.push('Prazo anual vencido');
   if(hoursOverdue)details.push('Ultrapassou 300 h desde a última revisão');
-  alerts.push('<div style="background:#ffe5e5;border-left:5px solid #c22;color:#a11616;padding:12px;margin:12px 0;border-radius:7px"><strong>REVISÃO VENCIDA — '+machine+'</strong><div style="font-size:13px;margin-top:5px">'+details.join(' · ')+'<br>Próximo ciclo previsto: '+tier+'<br>'+services+'</div></div>');
+  highlighted.add(String(last.id));
+  alerts.push('<div style="background:#ffe5e5;border-left:5px solid #c22;color:#a11616;padding:12px;margin:12px 0;border-radius:7px"><strong>REVISÃO VENCIDA — '+machine+'</strong><div style="font-size:13px;margin-top:5px">'+details.join(' · ')+'<br>Próximo ciclo previsto: '+tier+'<br>'+services+'</div><div style="display:flex;gap:8px;margin-top:10px"><button type="button" style="margin:0;flex:1" onclick="edit('+last.id+')">EDITAR</button><button type="button" style="margin:0;flex:1;background:#a73333" onclick="del('+last.id+')">EXCLUIR</button></div></div>');
  }
  target.innerHTML=alerts.join('');
+ document.querySelectorAll('#r article[data-record-id]').forEach(el=>{el.style.display=highlighted.has(el.dataset.recordId)?'none':''});
 }
 window.render=function(){oldRender();showOverdue()};
 document.getElementById('filter').onchange=window.render;
