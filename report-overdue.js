@@ -1,0 +1,1 @@
+(()=>{function check(){const pane=document.getElementById('reportPane');if(!pane||!window.data)return}window.addEventListener('load',check)})();
