@@ -28,7 +28,7 @@ onAuthStateChanged(auth,async user=>{
  const existing=local();
  for(const record of existing){const same=[...remote.values()].some(x=>x.m===record.m&&x.d===record.d&&String(x.h)===String(record.h)&&Boolean(x.w)===Boolean(record.w)&&JSON.stringify([...(x.s||[])].sort())===JSON.stringify([...(record.s||[])].sort()));if(!remote.has(String(record.id))&&!same){await setDoc(doc(col,String(record.id)),record);remote.set(String(record.id),record)}}
  const newer=local();
- for(const record of newer){if(!remote.has(String(record.id))){await setDoc(doc(col,String(record.id)),record);remote.set(String(record.id),record)}}
+ for(const record of newer){const same=[...remote.values()].some(x=>x.m===record.m&&x.d===record.d&&String(x.h)===String(record.h)&&Boolean(x.w)===Boolean(record.w)&&JSON.stringify([...(x.s||[])].sort())===JSON.stringify([...(record.s||[])].sort()));if(!remote.has(String(record.id))&&!same){await setDoc(doc(col,String(record.id)),record);remote.set(String(record.id),record)}}
  const merged=[...remote.values()].sort((a,b)=>(a.id||0)-(b.id||0));
  window.applyCloudRecords(merged);
  ready=true;status('Firebase conectado ✓ '+merged.length+' manutenção(ões) sincronizada(s).');
