@@ -34,5 +34,5 @@ onAuthStateChanged(auth,async user=>{
  window.applyCloudRecords(merged);
  ready=true;status('Firebase conectado ✓ '+merged.length+' manutenção(ões) sincronizada(s).');
  void flush();
- }catch(e){status('Não foi possível sincronizar: '+(e.code||e.message||'erro desconhecido')+'. Registros locais preservados.')}
+ }catch(e){const denied=e.code==='permission-denied';status((denied?'Acesso do atalho não autorizado. Identificação deste dispositivo: '+user.uid+'. Envie esse código para autorizar o acesso. ':'Não foi possível sincronizar: '+(e.code||e.message||'erro desconhecido')+'. ')+'Registros locais preservados.')}
 });
