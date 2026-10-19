@@ -78,7 +78,7 @@
    const last=plan.last;
    const services=last&&Array.isArray(last.s)?last.s.map(i=>ss[i]).filter(Boolean):[];
    const date=last&&last.d?last.d.split('-').reverse().join('/'):'Não registrada';
-   const meter=last&&last.w&&last.h!==''?' · '+fmt(last.h)+' h':'';
+   const meter=last&&last.w&&last.h!==''&&last.h!==null&&last.h!==undefined&&Number.isFinite(Number(last.h))?' · '+fmt(last.h)+' h':(last?' · Sem horímetro':'');
    cards.push('<div style="background:#f1f6f2;border-left:4px solid #174c36;border-radius:8px;padding:12px;margin:10px 0">'+
     '<b>'+machine+'</b>'+
     '<div style="margin-top:8px"><strong>Última revisão:</strong> '+date+meter+'</div>'+
