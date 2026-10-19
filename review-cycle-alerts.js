@@ -86,18 +86,22 @@
    notices.push('<div class="notice'+(level==='overdue'?' overdue':level==='warn'?' warn':'')+'" style="margin:8px 0"><b>'+machine+'</b>'+
     '<div>Próxima revisão: <strong>'+plan.name+'</strong></div>'+
     '<div class="small">Horímetro previsto: '+fmt(plan.target)+' h'+(!plan.lastMeter?' · Sem referência anterior':'')+'</div>'+
-    (meter?'<div class="small">'+meter.text+'</div>':'')+'</div>');
+    (meter?'<div class="small">'+meter.text+'</div>':'')+
+    (plan.last?'<div style="margin-top:9px;border-top:1px solid #d6e0d7;padding-top:8px"><b>ÚLTIMA REVISÃO REALIZADA</b>'+
+      '<div class="small">Data: '+plan.last.d.split('-').reverse().join('/')+
+      (plan.last.w&&plan.last.h!==''?' · Horímetro: '+fmt(plan.last.h)+' h':' · Sem horímetro')+'</div>'+
+      '<div style="margin-top:5px">'+(Array.isArray(plan.last.s)&&plan.last.s.length?
+        plan.last.s.map(i=>ss[i]!==undefined?'✓ '+ss[i]:'').filter(Boolean).join('<br>'):
+        'Nenhum serviço informado')+'</div></div>':
+      '<div class="small" style="margin-top:7px">Nenhuma revisão cadastrada</div>')+'</div>');
    if(!overdue.length||!plan.last)continue;
-   const lastId=Number(plan.last.id);
    alerts.push('<div class="notice overdue"><b>REVISÃO VENCIDA — '+machine+'</b>'+
     '<div class="small" style="margin:6px 0">'+overdue.map(s=>s.text).join('<br>')+'</div>'+
-    '<div>Próxima revisão: '+plan.name+'</div>'+
-    '<div class="formActions"><button type="button" onclick="edit('+lastId+')">EDITAR</button>'+
-    '<button type="button" class="cancelAction" onclick="del('+lastId+')">EXCLUIR</button></div></div>');
+    '<div>Próxima revisão: '+plan.name+'</div></div>');
   }
   panel.innerHTML='<h3>Próximas revisões</h3>'+notices.join('');
   $('overdueSummary').innerHTML=alerts.join('');
-  // Os registros originais permanecem visíveis e editáveis no relatório.
+  // Histórico permanece visível no relatório, somente para consulta.
  }
  const oldRender=window.render;
  window.render=function(){oldRender();reportAlerts()};
