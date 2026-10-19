@@ -71,37 +71,27 @@
   const filter=$('filter').value;
   let panel=$('reviewCycleSummary');
   if(!panel){panel=document.createElement('div');panel.id='reviewCycleSummary';$('overdueSummary').before(panel)}
-  const notices=[];
-  const alerts=[];
+  const cards=[];
   for(const machine of ms){
    if(filter&&filter!==machine)continue;
    const plan=getPlan(machine,null);
-   const current=currentMeterFor(machine);
-   const meter=meterStatus(plan,current);
-   const annual=annualStatus(plan.last);
-   const status=[meter,annual].filter(Boolean);
-   const overdue=status.filter(s=>s.level==='overdue');
-   const warning=status.filter(s=>s.level==='warn');
-   const level=overdue.length?'overdue':warning.length?'warn':'normal';
-   notices.push('<div class="notice'+(level==='overdue'?' overdue':level==='warn'?' warn':'')+'" style="margin:8px 0"><b>'+machine+'</b>'+
-    '<div>Próxima revisão: <strong>'+plan.name+'</strong></div>'+
-    '<div class="small">Horímetro previsto: '+fmt(plan.target)+' h'+(!plan.lastMeter?' · Sem referência anterior':'')+'</div>'+
-    (meter?'<div class="small">'+meter.text+'</div>':'')+
-    (plan.last?'<div style="margin-top:9px;border-top:1px solid #d6e0d7;padding-top:8px"><b>ÚLTIMA REVISÃO REALIZADA</b>'+
-      '<div class="small">Data: '+plan.last.d.split('-').reverse().join('/')+
-      (plan.last.w&&plan.last.h!==''?' · Horímetro: '+fmt(plan.last.h)+' h':' · Sem horímetro')+'</div>'+
-      '<div style="margin-top:5px">'+(Array.isArray(plan.last.s)&&plan.last.s.length?
-        plan.last.s.map(i=>ss[i]!==undefined?'✓ '+ss[i]:'').filter(Boolean).join('<br>'):
-        'Nenhum serviço informado')+'</div></div>':
-      '<div class="small" style="margin-top:7px">Nenhuma revisão cadastrada</div>')+'</div>');
-   if(!overdue.length||!plan.last)continue;
-   alerts.push('<div class="notice overdue"><b>REVISÃO VENCIDA — '+machine+'</b>'+
-    '<div class="small" style="margin:6px 0">'+overdue.map(s=>s.text).join('<br>')+'</div>'+
-    '<div>Próxima revisão: '+plan.name+'</div></div>');
+   const last=plan.last;
+   const services=last&&Array.isArray(last.s)?last.s.map(i=>ss[i]).filter(Boolean):[];
+   const date=last&&last.d?last.d.split('-').reverse().join('/'):'Não registrada';
+   const meter=last&&last.w&&last.h!==''?' · '+fmt(last.h)+' h':'';
+   cards.push('<div style="background:#f1f6f2;border-left:4px solid #174c36;border-radius:8px;padding:12px;margin:10px 0">'+
+    '<b>'+machine+'</b>'+
+    '<div style="margin-top:8px"><strong>Última revisão:</strong> '+date+meter+'</div>'+
+    '<div style="margin-top:5px"><strong>Serviços realizados:</strong><div style="margin-top:3px">'+
+      (last?(services.length?services.map(s=>'✓ '+s).join('<br>'):'Nenhum serviço informado'):'Nenhuma revisão cadastrada')+
+    '</div></div>'+
+    '<div style="margin-top:8px"><strong>Próxima revisão:</strong> '+plan.name+
+    ' · '+fmt(plan.target)+' h</div></div>');
   }
-  panel.innerHTML='<h3>Próximas revisões</h3>'+notices.join('');
-  $('overdueSummary').innerHTML=alerts.join('');
-  // Histórico permanece visível no relatório, somente para consulta.
+  panel.innerHTML=cards.join('');
+  $('overdueSummary').innerHTML='';
+  // O relatório é resumido, somente consulta. Histórico permanece armazenado.
+  $('r').style.display='none';
  }
  const oldRender=window.render;
  window.render=function(){oldRender();reportAlerts()};
