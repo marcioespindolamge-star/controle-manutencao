@@ -48,7 +48,7 @@
  }
  function formAlert(){
   const panel=$('due');if(!panel)return;
-  const plan=getPlan($('m').value,editing);
+  const plan=getPlan($('m').value,null);
   const meterEnabled=$('w').checked;
   const current=currentMeterFor($('m').value);
   const messages=[];
