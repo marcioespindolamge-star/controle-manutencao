@@ -75,22 +75,25 @@
   for(const machine of ms){
    if(filter&&filter!==machine)continue;
    const plan=getPlan(machine,null);
-   const last=plan.last;
-   const services=last&&Array.isArray(last.s)?last.s.map(i=>ss[i]).filter(Boolean):[];
-   const date=last&&last.d?last.d.split('-').reverse().join('/'):'Não registrada';
-   const meter=last&&last.w&&last.h!==''&&last.h!==null&&last.h!==undefined&&Number.isFinite(Number(last.h))?' · '+fmt(last.h)+' h':(last?' · Sem horímetro':'');
-   cards.push('<div style="background:#f1f6f2;border-left:4px solid #174c36;border-radius:8px;padding:12px;margin:10px 0">'+
-    '<b>'+machine+'</b>'+
-    '<div style="margin-top:8px"><strong>Última revisão:</strong> '+date+meter+'</div>'+
-    '<div style="margin-top:5px"><strong>Serviços realizados:</strong><div style="margin-top:3px">'+
-      (last?(services.length?services.map(s=>'✓ '+s).join('<br>'):'Nenhum serviço informado'):'Nenhuma revisão cadastrada')+
-    '</div></div>'+
-    '<div style="margin-top:8px"><strong>Próxima revisão:</strong> '+plan.name+
-    ' · '+fmt(plan.target)+' h</div></div>');
+   const records=plan.records.slice().reverse();
+   const history=records.length?records.map((record,index)=>{
+    const date=record.d?record.d.split('-').reverse().join('/'):'Data não informada';
+    const meter=meterRecord(record)?' · '+fmt(record.h)+' h':' · Sem horímetro';
+    const services=Array.isArray(record.s)?record.s.map(i=>ss[i]).filter(Boolean):[];
+    return '<div class="maintenance-history-entry" style="padding:10px 0;border-top:1px solid #d5e1d8">'+
+     '<div><strong>Revisão '+(records.length-index)+'</strong> — '+date+meter+'</div>'+
+     '<div style="margin-top:5px">'+(services.length?services.map(s=>'✓ '+s).join('<br>'):'Nenhum serviço informado')+'</div></div>';
+   }).join(''):'<div style="margin-top:9px">Nenhuma revisão cadastrada.</div>';
+   cards.push('<section class="maintenance-report-machine" style="background:#f1f6f2;border-left:4px solid #174c36;border-radius:8px;padding:12px;margin:12px 0">'+
+    '<h3 style="margin:0 0 7px">'+machine+'</h3>'+
+    '<div class="small"><strong>Total de revisões: '+records.length+'</strong></div>'+
+    '<div style="margin:10px 0"><strong>Próxima revisão prevista:</strong> '+plan.name+' · '+fmt(plan.target)+' h</div>'+
+    '<div style="font-weight:700;margin:12px 0 7px">HISTÓRICO DE REVISÕES</div>'+
+    history+'</section>');
   }
   panel.innerHTML=cards.join('');
   $('overdueSummary').innerHTML='';
-  // O relatório é resumido, somente consulta. Histórico permanece armazenado.
+  // Mostra todo o histórico agrupado por máquina, sem botões de alteração.
   $('r').style.display='none';
  }
  const oldRender=window.render;
