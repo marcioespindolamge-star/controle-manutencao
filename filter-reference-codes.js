@@ -10,6 +10,14 @@
    3:'84239756 · Hidrostático: 84226258 / 48142231',
    7:'84120625',8:'84120624'
   },
+  'Pulverizador SP NH 2500':{
+   1:'84228488',
+   2:'84283691 · Secundário: 84412164',
+   3:'84516422 / 84226258 · Reservatório hidráulico: 87272033 (verificar)',
+   7:'87344136',
+   8:'87344135',
+   9:'Ar-condicionado: 87267363 · Internos da cabine: 84427718 / 84280229'
+  },
   'Trator NH 7630':{
    1:'84228488',2:'5802721728 / 51629287',3:'47628830',
    7:'87344136',8:'87344135'
@@ -26,6 +34,7 @@
   }
  };
  const notes={
+  'Pulverizador SP NH 2500':'NEW HOLLAND SP2500 — códigos informados para conferência',
   'Colheitadeira TC5070':'NEW HOLLAND TC5070 · Filtro de ar da cabine: 86545652 (2 unidades; não é carvão ativado)',
   'Trator NH 7630':'NEW HOLLAND 7630',
   'Trator John Deere':'JOHN DEERE 6600',
