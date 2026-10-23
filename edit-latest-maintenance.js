@@ -1,4 +1,4 @@
-// Exibe a última revisão em modo consulta; edição somente após confirmação.
+// A última revisão é sempre somente consulta. Apenas NOVA REVISÃO libera o formulário.
 (function(){
  const el=id=>document.getElementById(id);
  const machine=el('m'),form=el('f');
@@ -17,7 +17,7 @@
  newButton.id='newMaintenance';
  newButton.textContent='+ NOVA REVISÃO';
  newButton.style.cssText='flex:1;margin:0;background:#476e5d';
- actions.append(editButton,newButton);
+ actions.append(newButton);
  machine.insertAdjacentElement('afterend',mode);
  mode.insertAdjacentElement('afterend',actions);
  const today=()=>new Date().toLocaleDateString('en-CA');
@@ -29,8 +29,6 @@
   [el('d'),el('w'),el('h'),...checkboxes()].forEach(control=>control.disabled=locked);
   saveButton.disabled=locked;
   saveButton.style.opacity=locked?'0.45':'1';
-  editButton.disabled=!locked;
-  editButton.style.opacity=locked?'1':'0.45';
  }
  function latest(){
   return data.filter(r=>r.m===machine.value&&r.d)
@@ -38,9 +36,9 @@
  }
  function loadLast(){
   const record=latest();
-  if(!record){newRecord();display('Nenhuma revisão cadastrada. Preencha uma NOVA REVISÃO.');return}
+  if(!record){showEmpty();return}
   state='view';
-  editing=record.id;
+  editing=null;
   el('d').value=record.d||today();
   el('w').checked=Boolean(record.w);
   el('hw').hidden=!el('w').checked;
@@ -48,7 +46,15 @@
   const selected=new Set((record.s||[]).map(Number));
   checkboxes().forEach(box=>box.checked=selected.has(Number(box.value)));
   lock(true);
-  display('ÚLTIMA REVISÃO — SOMENTE CONSULTA. Toque em EDITAR para alterar os dados.');
+  display('ÚLTIMA REVISÃO — SOMENTE CONSULTA. Para preencher uma manutenção, toque em + NOVA REVISÃO.');
+  window.updateDue();
+ }
+ function showEmpty(){
+  state='view';editing=null;
+  el('d').value=today();el('w').checked=true;el('hw').hidden=false;el('h').value='';
+  checkboxes().forEach(box=>box.checked=false);
+  lock(true);
+  display('Nenhuma revisão cadastrada. Toque em + NOVA REVISÃO para habilitar o preenchimento.');
   window.updateDue();
  }
  function newRecord(){
@@ -60,17 +66,9 @@
   el('h').value='';
   checkboxes().forEach(box=>box.checked=false);
   lock(false);
-  editButton.disabled=true;
-  editButton.style.opacity='0.45';
   display('NOVA REVISÃO — SALVAR criará um registro separado.');
   window.updateDue();
  }
- editButton.addEventListener('click',()=>{
-  if(state!=='view')return;
-  state='edit';
-  lock(false);
-  display('EDITANDO A ÚLTIMA REVISÃO — SALVAR atualizará o registro existente.');
- });
  machine.addEventListener('change',loadLast);
  newButton.addEventListener('click',newRecord);
  el('tabForm').addEventListener('click',loadLast);
