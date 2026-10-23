@@ -4,6 +4,11 @@
  const filters=document.getElementById('s');
  if(!machine||!filters)return;
  const refs={
+  'Colheitadeira TC5070':{
+   1:'84228488',2:'84526251 / 84283691 (conforme sistema)',
+   3:'84239756 · Hidrostático: 84226258 / 48142231',
+   7:'84120625',8:'84120624'
+  },
   'Trator NH 7630':{
    1:'84228488',2:'5802721728 / 51629287',3:'47628830',
    7:'87344136',8:'87344135'
@@ -20,6 +25,7 @@
   }
  };
  const notes={
+  'Colheitadeira TC5070':'NEW HOLLAND TC5070 · Filtro da cabine: 86545652 (não é carvão ativado)',
   'Trator NH 7630':'NEW HOLLAND 7630',
   'Trator John Deere':'JOHN DEERE 6600',
   'Trator NH TL75':'NEW HOLLAND TL75 MWM'
