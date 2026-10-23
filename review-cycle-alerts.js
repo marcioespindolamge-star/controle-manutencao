@@ -22,7 +22,7 @@
   const reference=lastMeter?Number(lastMeter.h):null;
   // Próxima faixa de 300 horas acima do último horímetro de manutenção registrado.
   const target=reference===null?300:reference+300;
-  const phase=target%1200||1200;
+  const phase=[300,600,900,1200][records.length%4];
   return {records,last,lastMeter,reference,target,phase,...steps[phase]};
  }
  function annualStatus(last){
