@@ -1,4 +1,4 @@
-// A última revisão é sempre somente consulta. Apenas NOVA REVISÃO libera o formulário.
+// A última revisão abre bloqueada; EDITAR corrige o registro e NOVA REVISÃO cria outro.
 (function(){
  const el=id=>document.getElementById(id);
  const machine=el('m'),form=el('f');
@@ -17,7 +17,7 @@
  newButton.id='newMaintenance';
  newButton.textContent='+ NOVA REVISÃO';
  newButton.style.cssText='flex:1;margin:0;background:#476e5d';
- actions.append(newButton);
+ actions.append(editButton,newButton);
  machine.insertAdjacentElement('afterend',mode);
  mode.insertAdjacentElement('afterend',actions);
  const today=()=>new Date().toLocaleDateString('en-CA');
@@ -29,6 +29,8 @@
   [el('d'),el('w'),el('h'),...checkboxes()].forEach(control=>control.disabled=locked);
   saveButton.disabled=locked;
   saveButton.style.opacity=locked?'0.45':'1';
+  editButton.disabled=!locked||!latest();
+  editButton.style.opacity=editButton.disabled?'0.45':'1';
  }
  function latest(){
   return data.filter(r=>r.m===machine.value&&r.d)
@@ -46,7 +48,7 @@
   const selected=new Set((record.s||[]).map(Number));
   checkboxes().forEach(box=>box.checked=selected.has(Number(box.value)));
   lock(true);
-  display('ÚLTIMA REVISÃO — SOMENTE CONSULTA. Para preencher uma manutenção, toque em + NOVA REVISÃO.');
+  display('ÚLTIMA REVISÃO — SOMENTE CONSULTA. EDITAR corrige este registro; + NOVA REVISÃO cria outro.');
   window.updateDue();
  }
  function showEmpty(){
@@ -69,6 +71,18 @@
   display('NOVA REVISÃO — SALVAR criará um registro separado.');
   window.updateDue();
  }
+ editButton.addEventListener('click',()=>{
+  if(state!=='view')return;
+  const record=latest();
+  if(!record)return;
+  editing=record.id;
+  state='edit';
+  lock(false);
+  editButton.disabled=true;
+  editButton.style.opacity='0.45';
+  display('EDITANDO A ÚLTIMA REVISÃO — SALVAR corrige este registro sem duplicar.');
+  window.updateDue();
+ });
  machine.addEventListener('change',loadLast);
  newButton.addEventListener('click',newRecord);
  el('tabForm').addEventListener('click',loadLast);
